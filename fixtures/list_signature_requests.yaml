@@ -5,9 +5,7 @@ interactions:
 - request:
     body: ""
     form: {}
-    headers:
-      Authorization:
-      - Basic YTNhNmY3YI2ODE4YWJkOGZjMjQ5ZWVmOWNlMTY2MTRmNmQ2Nzo=
+    headers: {}
     url: https://api.hellosign.com/v3/signature_request/list
     method: GET
   response:

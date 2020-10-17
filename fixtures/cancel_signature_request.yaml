@@ -5,9 +5,7 @@ interactions:
 - request:
     body: ""
     form: {}
-    headers:
-      Authorization:
-      - Basic YTA1NjU0YjMjQ5ZWVmOWNlMTY2MTRmNmQ2Nzo=
+    headers: {}
     url: https://api.hellosign.com/v3/signature_request/cancel/5c002b65dfefab79795a521bef312c45914cc48d
     method: POST
   response:

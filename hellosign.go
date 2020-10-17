@@ -27,25 +27,30 @@ type Client struct {
 
 // EmbeddedRequest contains the request parameters for create_embedded
 type EmbeddedRequest struct {
-	TestMode              bool                  `form_field:"test_mode"`
-	ClientID              string                `form_field:"client_id"`
-	FileURL               []string              `form_field:"file_url"`
-	File                  []string              `form_field:"file"`
-	Title                 string                `form_field:"title"`
-	Subject               string                `form_field:"subject"`
-	Message               string                `form_field:"message"`
-	SigningRedirectURL    string                `form_field:"signing_redirect_url"`
-	Signers               []Signer              `form_field:"signers"`
-	CCEmailAddresses      []string              `form_field:"cc_email_addresses"`
-	UseTextTags           bool                  `form_field:"use_text_tags"`
-	HideTextTags          bool                  `form_field:"hide_text_tags"`
-	Metadata              map[string]string     `form_field:"metadata"`
+	TestMode           bool     `form_field:"test_mode"`
+	ClientID           string   `form_field:"client_id"`
+	FileURL            []string `form_field:"file_url"`
+	File               []string `form_field:"file"`
+	Title              string   `form_field:"title"`
+	Subject            string   `form_field:"subject"`
+	Message            string   `form_field:"message"`
+	SigningRedirectURL string   `form_field:"signing_redirect_url"`
+	Signers            []Signer `form_field:"signers"`
+	// Attachments            []Attachment `form_field:"attachments"`
+	CustomFields     []CustomField     `form_field:"custom_fields"`
+	CCEmailAddresses []string          `form_field:"cc_email_addresses"`
+	UseTextTags      bool              `form_field:"use_text_tags"`
+	HideTextTags     bool              `form_field:"hide_text_tags"`
+	Metadata         map[string]string `form_field:"metadata"`
+	// AllowDecline          int                   `form_field:"allow_decline"`
+	// AllowReassign         int                   `form_field:"allow_reassign"`
 	FormFieldsPerDocument [][]DocumentFormField `form_field:"form_fields_per_document"`
+	// FieldOptions map[string]string `form_field:"field_options"``
 }
 
 type Signer struct {
 	Name  string `field:"name"`
-	Email string `field:"email"`
+	Email string `field:"email_address"`
 	Order int    `field:"order"`
 	Pin   string `field:"pin"`
 }
@@ -71,8 +76,11 @@ type SignatureRequest struct {
 	SignatureRequestID    string                   `json:"signature_request_id"`    // The id of the SignatureRequest.
 	RequesterEmailAddress string                   `json:"requester_email_address"` // The email address of the initiator of the SignatureRequest.
 	Title                 string                   `json:"title"`                   // The title the specified Account uses for the SignatureRequest.
+	OriginalTitle         string                   `json:"original_title"`          // Default Label for account.
 	Subject               string                   `json:"subject"`                 // The subject in the email that was initially sent to the signers.
 	Message               string                   `json:"message"`                 // The custom message in the email that was initially sent to the signers.
+	Metadata              map[string]interface{}   `json:"metadata"`                // The metadata attached to the signature request.
+	CreatedAt             int                      `json:"created_at"`              // Time the signature request was created.
 	IsComplete            bool                     `json:"is_complete"`             // Whether or not the SignatureRequest has been fully executed by all signers.
 	IsDeclined            bool                     `json:"is_declined"`             // Whether or not the SignatureRequest has been declined by a signer.
 	HasError              bool                     `json:"has_error"`               // Whether or not an error occurred (either during the creation of the SignatureRequest or during one of the signings).
@@ -88,11 +96,12 @@ type SignatureRequest struct {
 }
 
 type CustomField struct {
-	Name     string `json:"name"`     // The name of the Custom Field.
-	Type     string `json:"type"`     // The type of this Custom Field. Only 'text' and 'checkbox' are currently supported.
-	Value    string `json:"value"`    // A text string for text fields or true/false for checkbox fields
-	Required bool   `json:"required"` // A boolean value denoting if this field is required.
-	Editor   string `json:"editor"`   // The name of the Role that is able to edit this field.
+	Name     string      `json:"name"`     // The name of the Custom Field.
+	Type     string      `json:"type"`     // The type of this Custom Field. Only 'text' and 'checkbox' are currently supported.
+	Value    interface{} `json:"value"`    // A text string for text fields or true/false for checkbox fields
+	Required bool        `json:"required"` // A boolean value denoting if this field is required.
+	ApiID    string      `json:"api_id"`   // The unique ID for this field.
+	Editor   *string     `json:"editor"`   // The name of the Role that is able to edit this field.
 }
 
 type ResponseData struct {
@@ -105,16 +114,19 @@ type ResponseData struct {
 }
 
 type Signature struct {
-	SignatureID        string `json:"signature_id"`         // Signature identifier.
-	SignerEmailAddress string `json:"signer_email_address"` // The email address of the signer.
-	SignerName         string `json:"signer_name"`          // The name of the signer.
-	Order              int    `json:"order"`                // If signer order is assigned this is the 0-based index for this signer.
-	StatusCode         string `json:"status_code"`          // The current status of the signature. eg: awaiting_signature, signed, declined
-	DeclineReason      string `json:"decline_reason"`       // The reason provided by the signer for declining the request.
-	SignatedAt         int    `json:"signed_at"`            // Time that the document was signed or null.
-	LastViewedAt       int    `json:"last_viewed_at"`       //The time that the document was last viewed by this signer or null.
-	LastRemindedAt     int    `json:"last_reminded_at"`     //The time the last reminder email was sent to the signer or null.
-	HasPin             bool   `json:"has_pin"`              // Boolean to indicate whether this signature requires a PIN to access.
+	SignatureID        string  `json:"signature_id"`         // Signature identifier.
+	SignerEmailAddress string  `json:"signer_email_address"` // The email address of the signer.
+	SignerName         string  `json:"signer_name"`          // The name of the signer.
+	Order              int     `json:"order"`                // If signer order is assigned this is the 0-based index for this signer.
+	StatusCode         string  `json:"status_code"`          // The current status of the signature. eg: awaiting_signature, signed, declined
+	DeclineReason      string  `json:"decline_reason"`       // The reason provided by the signer for declining the request.
+	SignedAt           int     `json:"signed_at"`            // Time that the document was signed or null.
+	LastViewedAt       int     `json:"last_viewed_at"`       // The time that the document was last viewed by this signer or null.
+	LastRemindedAt     int     `json:"last_reminded_at"`     // The time the last reminder email was sent to the signer or null.
+	HasPin             bool    `json:"has_pin"`              // Boolean to indicate whether this signature requires a PIN to access.
+	ReassignedBy       string  `json:"reassigned_by"`        // Email address of original signer who reassigned to this signer.
+	ReassignmentReason string  `json:"reassignment_reason"`  // Reason provided by original signer who reassigned to this signer.
+	Error              *string `json:"error"`                // Error message pertaining to this signer, or null.
 }
 
 type Warning struct {

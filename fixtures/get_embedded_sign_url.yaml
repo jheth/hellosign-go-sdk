@@ -5,9 +5,7 @@ interactions:
 - request:
     body: ""
     form: {}
-    headers:
-      Authorization:
-      - Basic YTA1NjU0YjMjQ5ZWVmOWNlMTY2MTRmNmQ2Nzo=
+    headers: {}
     url: https://api.hellosign.com/v3/embedded/sign_url/deaf86bfb33764d9a215a07cc060122d
     method: GET
   response:

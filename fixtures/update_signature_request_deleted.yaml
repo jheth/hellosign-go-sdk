@@ -8,8 +8,6 @@ interactions:
       form-data; name=\"email_address\"\r\n\r\nfranky@hellosign.com"
     form: {}
     headers:
-      Authorization:
-      - Basic YTA1NjU0YjMjQ5ZWVmOWNlMTY2MTRmNmQ2Nzo=
       Content-Type:
       - multipart/form-data; boundary=1d37d77b880d452a767a14bd0eec84f3af1ec22be31bb77d6370ed5413ba
     url: https://api.hellosign.com/v3/signature_request/update/5c002b65dfefab79795a521bef312c45914cc48d

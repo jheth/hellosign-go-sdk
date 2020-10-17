@@ -30,6 +30,44 @@ func TestCreateEmbeddedSignatureRequestSuccess(t *testing.T) {
 	assert.Equal(t, false, res.IsDeclined)
 }
 
+func TestCreateEmbeddedSignatureRequestSuccess2(t *testing.T) {
+	// Start our recorder
+	vcr := fixture("fixtures/embedded_signature_request_more_fields")
+	defer vcr.Stop() // Make sure recorder is stopped once done with it
+
+	client := createVcrClient(vcr)
+
+	embReq := createEmbeddedRequest()
+	res, err := client.CreateEmbeddedSignatureRequest(embReq)
+
+	assert.NotNil(t, res, "Should return response")
+	assert.Nil(t, err, "Should not return error")
+
+	assert.Equal(t, "0afd5e3ac99a19a7e2aa68740faf9bd32441dc11", res.SignatureRequestID)
+	assert.Equal(t, "awesome", res.Subject)
+	assert.Equal(t, true, res.TestMode)
+	assert.Equal(t, false, res.IsComplete)
+	assert.Equal(t, false, res.IsDeclined)
+}
+
+func TestCreateEmbeddedSignatureRequestMissingSigners(t *testing.T) {
+	// Start our recorder
+	vcr := fixture("fixtures/embedded_signature_request_missing_signers")
+	defer vcr.Stop() // Make sure recorder is stopped once done with it
+
+	client := createVcrClient(vcr)
+
+	embReq := createEmbeddedRequest()
+	embReq.Signers = []Signer{}
+
+	res, err := client.CreateEmbeddedSignatureRequest(embReq)
+
+	assert.Nil(t, res, "Should not return response")
+	assert.NotNil(t, err, "Should return error")
+
+	assert.Equal(t, err.Error(), "bad_request: Must specify a name for each signer")
+}
+
 func TestCreateEmbeddedSignatureRequestFileURL(t *testing.T) {
 	// Start our recorder
 	vcr := fixture("fixtures/embedded_signature_request_file_url")
@@ -44,7 +82,7 @@ func TestCreateEmbeddedSignatureRequestFileURL(t *testing.T) {
 		Title:    "My First Document",
 		Subject:  "Contract",
 		Signers: []Signer{
-			Signer{
+			{
 				Email: "jane@example.com",
 				Name:  "Jane Doe",
 			},
@@ -188,8 +226,8 @@ func TestUpdateSignatureRequestFails(t *testing.T) {
 		"franky@hellosign.com",
 	)
 
-	assert.Nil(t, res, "Should return response")
-	assert.NotNil(t, err, "Should not return error")
+	assert.Nil(t, res, "Should not return response")
+	assert.NotNil(t, err, "Should return error")
 
 	assert.Equal(t, "deleted: This resource has been deleted", err.Error())
 }
@@ -228,11 +266,11 @@ func createEmbeddedRequest() EmbeddedRequest {
 		Message: "cool message bro",
 		// SigningRedirectURL: "example signing redirect url",
 		Signers: []Signer{
-			Signer{
+			{
 				Email: "freddy@hellosign.com",
 				Name:  "Freddy Rangel",
 			},
-			Signer{
+			{
 				Email: "frederick.rangel@gmail.com",
 				Name:  "Frederick Rangel",
 			},
@@ -249,7 +287,7 @@ func createEmbeddedRequest() EmbeddedRequest {
 		},
 		FormFieldsPerDocument: [][]DocumentFormField{
 			[]DocumentFormField{
-				DocumentFormField{
+				{
 					APIId:    "api_id",
 					Name:     "display name",
 					Type:     "text",
@@ -261,7 +299,7 @@ func createEmbeddedRequest() EmbeddedRequest {
 				},
 			},
 			[]DocumentFormField{
-				DocumentFormField{
+				{
 					APIId:    "api_id_2",
 					Name:     "display name 2",
 					Type:     "text",

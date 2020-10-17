@@ -8,8 +8,6 @@ interactions:
       form-data; name=\"get_url\"\r\n\r\nfalse"
     form: {}
     headers:
-      Authorization:
-      - Basic YTA1NjU0YjMjQ5ZWVmOWNlMTY2MTRmNmQ2Nzo=
       Content-Type:
       - multipart/form-data; boundary=e747237b5b83b9945f6c82ebaecbfcef8459e4bb0087a6f08b82271dcce8
     url: https://api.hellosign.com/v3/signature_request/files/6d7ad140141a7fe6874fec55931c363e0301c353

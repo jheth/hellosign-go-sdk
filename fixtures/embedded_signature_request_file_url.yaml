@@ -15,8 +15,6 @@ interactions:
       form-data; name=\"hide_text_tags\"\r\n\r\n0\r\n--c9eba067d628877e0430d161e32a71be03d82fb0e4cf139718bdc30a48f8--\r\n"
     form: {}
     headers:
-      Authorization:
-      - Basic YTA1NjU0YjMjQ5ZWVmOWNlMTY2MTRmNmQ2Nzo=
       Content-Type:
       - multipart/form-data; boundary=c9eba067d628877e0430d161e32a71be03d82fb0e4cf139718bdc30a48f8
     url: https://api.hellosign.com/v3/signature_request/create_embedded
