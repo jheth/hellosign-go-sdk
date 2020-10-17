@@ -6,6 +6,7 @@ import (
 	"os"
 	"testing"
 
+	"github.com/dnaeon/go-vcr/cassette"
 	"github.com/dnaeon/go-vcr/recorder"
 	"github.com/stretchr/testify/assert"
 )
@@ -66,6 +67,21 @@ func TestCreateEmbeddedSignatureRequestMissingSigners(t *testing.T) {
 	assert.NotNil(t, err, "Should return error")
 
 	assert.Equal(t, err.Error(), "bad_request: Must specify a name for each signer")
+}
+func TestCreateEmbeddedSignatureRequestWarnings(t *testing.T) {
+	// Start our recorder
+	vcr := fixture("fixtures/embedded_signature_request_warnings")
+
+	client := createVcrClient(vcr)
+
+	embReq := createEmbeddedRequest()
+
+	res, err := client.CreateEmbeddedSignatureRequest(embReq)
+
+	assert.Nil(t, res, "Should not return response")
+	assert.NotNil(t, err, "Should return error")
+
+	assert.Equal(t, err.Error(), "parameter_missing: field is missing, empty_value: oops")
 }
 
 func TestCreateEmbeddedSignatureRequestFileURL(t *testing.T) {
@@ -239,6 +255,13 @@ func fixture(path string) *recorder.Recorder {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	// Add a filter which removes Authorization headers from all requests:
+	vcr.AddFilter(func(i *cassette.Interaction) error {
+		delete(i.Request.Headers, "Authorization")
+		return nil
+	})
+
 	return vcr
 }
 
