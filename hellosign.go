@@ -12,6 +12,7 @@ import (
 	"os"
 	"reflect"
 	"strconv"
+	"strings"
 )
 
 const (
@@ -147,7 +148,8 @@ type ListInfo struct {
 }
 
 type ErrorResponse struct {
-	Error *Error `json:"error"`
+	Error    *Error    `json:"error"`
+	Warnings []Warning `json:"warnings"`
 }
 
 type Error struct {
@@ -475,9 +477,19 @@ func (m *Client) request(method string, path string, params *bytes.Buffer, w mul
 	}
 
 	if response.StatusCode >= 400 {
+		msg := fmt.Sprintf("hellosign request failed with status %d", response.StatusCode)
 		e := &ErrorResponse{}
 		json.NewDecoder(response.Body).Decode(e)
-		msg := fmt.Sprintf("%s: %s", e.Error.Name, e.Error.Message)
+		if e.Error != nil {
+			msg = fmt.Sprintf("%s: %s", e.Error.Name, e.Error.Message)
+		} else {
+			messages := []string{}
+			for _, w := range e.Warnings {
+				messages = append(messages, fmt.Sprintf("%s: %s", w.Name, w.Message))
+			}
+			msg = strings.Join(messages, ", ")
+		}
+
 		return response, errors.New(msg)
 	}
 
